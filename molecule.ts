@@ -11,6 +11,36 @@ export class Molecule {
   private bonds: Bond[] = [];
   private bondMap = new Map<Atom, Bond[]>();
 
+  static fromMolecularFormula(formula: string, center: [number, number]) {
+    const atoms: [string, number][] = Molecule.parseFormula(formula);
+
+    const molecule = new Molecule();
+    for (const [symbol, count] of atoms) {
+      for (let i = 0; i < count; i++) {
+        molecule.addAtom(new Atom(symbol, center));
+      }
+    }
+
+    return molecule;
+  }
+
+  private static parseFormula(formula: string) {
+    const atoms: [string, number][] = [];
+    for (let i = 0; i < formula.length;) {
+      let symbol = formula[i++];
+      let count = '';
+      while (i < formula.length && isLower(formula[i])) {
+        symbol += formula[i++];
+      }
+      while (i < formula.length && isNumeric(formula[i])) {
+        count += formula[i++];
+      }
+
+      atoms.push([symbol, +count || 1]);
+    }
+    return atoms;
+  }
+
   log() {
     console.group('ATOMS:');
     console.table(this.atoms);
@@ -96,9 +126,6 @@ export class Molecule {
       this.bond(centerAtom, atom);
     }
 
-    console.log(this.bondMap.get(centerAtom));
-    console.log(centerAtom.requiredBonds);
-    console.log(this.hasRequiredBonds);
     for (let i = 0; !this.hasRequiredBonds; i++) {
       if (i > 100) {
         throw new Error('Auto bonding taking too long');
@@ -107,22 +134,24 @@ export class Molecule {
       for (const atom of otherAtoms) {
         if (atom.requiredBonds > this.totalBonds(atom)) {
           this.bond(centerAtom, atom);
+          break;
         }
       }
     }
   }
 
   get hasRequiredBonds() {
+    let extraBondsNeeded = 0;
     for (const atom of this.atoms) {
       const totalBonds = this.totalBonds(atom);
       if (totalBonds !== atom.requiredBonds) {
         if (totalBonds > atom.requiredBonds) {
           console.warn(`${atom.symbol} atom is over-bonded`);
         }
-        return false;
+        extraBondsNeeded += atom.requiredBonds - totalBonds;
       }
     }
-    return true;
+    return extraBondsNeeded === 0;
   }
 
   private totalBonds(atom: Atom) {
@@ -130,4 +159,12 @@ export class Molecule {
     const totalBonds = bondList.reduce((acc, bond) => acc + bond.count, 0);
     return totalBonds;
   }
+}
+
+function isLower(c: string) {
+  return c === c.toLowerCase() && c !== c.toUpperCase();
+}
+
+function isNumeric(c: string) {
+  return '1234567890'.includes(c);
 }
