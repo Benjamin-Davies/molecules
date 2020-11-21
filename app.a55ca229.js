@@ -13,4 +13,4 @@ parcelRequire=function(e,r,t,n){var i,o="function"==typeof parcelRequire&&parcel
 },{"./atom":"zrKI","./bond":"hXCS","./math":"eDgl"}],"EVxB":[function(require,module,exports) {
 "use strict";Object.defineProperty(exports,"__esModule",{value:!0});var e=require("./canvas"),r=require("./molecule"),a=new e.Canvas("main-canvas"),l=r.Molecule.fromSimpleStructuralFormula("CH3CH2CH3",a.center);l.log(),l.draw(a);
 },{"./canvas":"zcNd","./molecule":"wktd"}]},{},["EVxB"], null)
-//# sourceMappingURL=/app.a55ca229.js.map
+//# sourceMappingURL=/molecules/app.a55ca229.js.map
