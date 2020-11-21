@@ -18,9 +18,11 @@ export class Canvas {
     let lastFrame = performance.now();
     const fn = () => {
       const now = performance.now();
-      const dt = now - lastFrame;
+      const dt = (now - lastFrame) / 1000;
       lastFrame = now;
       let cancelled = false;
+
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
       callback(dt, () => (cancelled = true));
 

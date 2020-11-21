@@ -6,8 +6,10 @@ import { above, below, dist, leftOf, rightOf } from "./math";
 const hydrogenBondLength = 50;
 const normalBondLength = 100;
 
+type FormulaParts = (string | FormulaParts)[];
+
 export class Molecule {
-  private atoms: Atom[] = [];
+  atoms: Atom[] = [];
   private bonds: Bond[] = [];
   private bondMap = new Map<Atom, Bond[]>();
 
@@ -29,7 +31,7 @@ export class Molecule {
     center: [number, number]
   ) {
     const atoms = Molecule.parseFormula(formula).map(
-      (symbol) => new Atom(symbol, [0, 0])
+      (symbol) => new Atom(symbol, center)
     );
 
     const molecule = new Molecule();
@@ -59,9 +61,106 @@ export class Molecule {
     }
 
     molecule.addExtraBonds();
-    molecule.center(center);
 
     return molecule;
+  }
+
+  static fromStructuralFormula(formula: string, center: [number, number]) {
+    const parts = this.parseFormulaParts(formula);
+    return this.fromStructuralFormulaParts(parts, center);
+  }
+
+  private static fromStructuralFormulaParts(
+    parts: string | FormulaParts,
+    center: [number, number]
+  ): Molecule {
+    if (typeof parts === 'string') {
+      return this.fromSimpleStructuralFormula(parts, center);
+    } else {
+      return parts
+        .map((part) =>
+          this.fromStructuralFormulaParts(part, [
+            center[0] * Math.random(),
+            center[1] * Math.random(),
+          ])
+        )
+        .reduce((a, b) => a.join(b));
+    }
+  }
+
+  join(other: Molecule): Molecule {
+    const atom1 = this.freeAtom;
+    const atom2 = other.freeAtom;
+    this.merge(other);
+    this.bond(atom1, atom2);
+    return this;
+  }
+
+  get freeAtom() {
+    for (const atom of this.atoms) {
+      if (this.totalBonds(atom) < atom.requiredBonds) {
+        return atom;
+      }
+    }
+  }
+
+  merge(other: Molecule): Molecule {
+    this.atoms = this.atoms.concat(other.atoms);
+    this.bonds = this.bonds.concat(other.bonds);
+
+    for (const atom of other.atoms) {
+      this.bondMap.set(atom, []);
+    }
+    for (const bond of other.bonds) {
+      this.bondMap.get(bond.atom1).push(bond);
+      this.bondMap.get(bond.atom2).push(bond);
+    }
+
+    return this;
+  }
+
+  private static parseFormulaParts(formula: string) {
+    interface State {
+      parts: FormulaParts;
+      currentPart: string;
+    }
+
+    let state: State = {
+      parts: [],
+      currentPart: '',
+    };
+    const stack: State[] = [];
+    for (let i = 0; i < formula.length; ) {
+      const c = formula[i++];
+      switch (c) {
+        case '(':
+          state.parts.push(state.currentPart);
+          state.currentPart = '';
+
+          stack.push(state);
+          state = {
+            parts: [],
+            currentPart: '',
+          };
+          break;
+        case ')':
+          state.parts.push(state.currentPart);
+
+          const oldState = state;
+          state = stack.pop();
+          state.parts.push(oldState.parts);
+          break;
+        default:
+          state.currentPart += c;
+          break;
+      }
+    }
+
+    if (stack.length > 0) {
+      throw new Error('');
+    }
+    state.parts.push(state.currentPart);
+    return state.parts;
   }
 
   private static parseFormula(formula: string) {
@@ -204,7 +303,7 @@ export class Molecule {
 
   addExtraBonds() {
     for (let i = 0; !this.hasRequiredBonds; i++) {
-      if (i > 100) {
+      if (i > 10) {
         console.warn('Auto bonding taking too long, skipping');
         return;
       }

@@ -1,9 +1,14 @@
 import { Canvas } from './canvas';
 import { Molecule } from './molecule';
+import { simulate } from './simulate';
 
 const canvas = new Canvas('main-canvas');
 
-const molecule = Molecule.fromSimpleStructuralFormula('CH3CHClCHCHCOHOHNH2', canvas.center);
+const molecule = Molecule.fromStructuralFormula('CH3C(CH2CH3)CHCHCOHO', canvas.center);
 
 molecule.log();
-molecule.draw(canvas);
+canvas.animate((dt) => {
+  simulate(molecule, dt);
+  molecule.center(canvas.center);
+  molecule.draw(canvas);
+});
