@@ -10,7 +10,8 @@
     "typescript": "^4.1.2"
   },
   "scripts": {
-    "start": "parcel index.html"
+    "start": "parcel index.html",
+    "build": "parcel build index.html"
   },
   "author": "",
   "license": "ISC"
