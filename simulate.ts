@@ -12,7 +12,7 @@ export function simulate(molecule: Molecule, dt: number) {
 
       const d = dist(atom1.position, atom2.position);
       const n = normV(subV(atom1.position, atom2.position));
-      const vel = scaleV(1000 / (d * d), n);
+      const vel = scaleV(500 / (d * d), n);
       atom1.position = addV(atom1.position, vel);
     }
   }
