@@ -52,6 +52,7 @@ export class Molecule {
       molecule.bond(a, b);
     }
 
+    molecule.addExtraBonds();
     molecule.center(center);
 
     return molecule;
@@ -160,6 +161,9 @@ export class Molecule {
       this.bond(centerAtom, atom);
     }
 
+    this.addExtraBonds();
+
+    // For edge cases like SO2
     for (let i = 0; !this.hasRequiredBonds; i++) {
       if (i > 100) {
         throw new Error('Auto bonding taking too long');
@@ -186,6 +190,25 @@ export class Molecule {
       }
     }
     return extraBondsNeeded === 0;
+  }
+
+  addExtraBonds() {
+    for (let i = 0; !this.hasRequiredBonds; i++) {
+      if (i > 100) {
+        console.warn('Auto bonding taking too long, skipping');
+        return;
+      }
+
+      for (const bond of this.bonds) {
+        if (
+          this.totalBonds(bond.atom1) < bond.atom1.requiredBonds &&
+          this.totalBonds(bond.atom2) < bond.atom2.requiredBonds
+        ) {
+          this.bond(bond.atom1, bond.atom2);
+          break;
+        }
+      }
+    }
   }
 
   private totalBonds(atom: Atom) {
