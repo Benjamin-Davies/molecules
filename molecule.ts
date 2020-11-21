@@ -3,8 +3,8 @@ import { Bond } from "./bond";
 import { Canvas } from "./canvas";
 import { above, below, dist, leftOf, rightOf } from "./math";
 
-const bondLength = 100;
-const minBondLength = 70;
+const hydrogenBondLength = 50;
+const normalBondLength = 100;
 
 export class Molecule {
   private atoms: Atom[] = [];
@@ -109,7 +109,11 @@ export class Molecule {
       return;
     }
 
-    atom2.position = this.getNextBondingPosition(atom1);
+    const bondLength =
+      atom1.symbol === 'H' || atom2.symbol === 'H'
+        ? hydrogenBondLength
+        : normalBondLength;
+    atom2.position = this.getNextBondingPosition(atom1, bondLength);
 
     const bond = new Bond(atom1, atom2, count);
     this.bonds.push(bond);
@@ -125,7 +129,7 @@ export class Molecule {
     );
   }
 
-  getNextBondingPosition(atom: Atom): [number, number] {
+  getNextBondingPosition(atom: Atom, bondLength: number): [number, number] {
     const bonds = this.bondMap.get(atom);
     const bondedTo: Atom[] = [];
     for (const bond of bonds) {
