@@ -16,10 +16,9 @@ jobs:
       - run: npm ci
       - run: npm build
 
-      - name: Deploy
-      uses: s0/git-publish-subdir-action@master
-      env:
-        REPO: self
-        BRANCH: gh-pages
-        FOLDER: dist/
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: s0/git-publish-subdir-action@master
+        env:
+          REPO: self
+          BRANCH: gh-pages
+          FOLDER: dist/
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
