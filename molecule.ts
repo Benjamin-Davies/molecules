@@ -48,8 +48,14 @@ export class Molecule {
       }
       lastAtom = atom;
     }
+    lastAtom = null;
     for (const [a, b] of deferedBonds) {
-      molecule.bond(a, b);
+      if (lastAtom && molecule.totalBonds(lastAtom) < lastAtom.requiredBonds) {
+        molecule.bond(lastAtom, b);
+      } else {
+        molecule.bond(a, b);
+        lastAtom = b;
+      }
     }
 
     molecule.addExtraBonds();
