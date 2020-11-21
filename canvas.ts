@@ -22,6 +22,8 @@ export class Canvas {
       lastFrame = now;
       let cancelled = false;
 
+      this.canvas.width = this.canvas.clientWidth;
+      this.canvas.height = this.canvas.clientHeight;
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
       callback(dt, () => (cancelled = true));
