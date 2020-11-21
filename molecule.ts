@@ -12,31 +12,67 @@ export class Molecule {
   private bondMap = new Map<Atom, Bond[]>();
 
   static fromMolecularFormula(formula: string, center: [number, number]) {
-    const atoms: [string, number][] = Molecule.parseFormula(formula);
+    const atoms = Molecule.parseFormula(formula);
 
     const molecule = new Molecule();
-    for (const [symbol, count] of atoms) {
-      for (let i = 0; i < count; i++) {
-        molecule.addAtom(new Atom(symbol, center));
-      }
+    for (const symbol of atoms) {
+      molecule.addAtom(new Atom(symbol, center));
     }
+
+    molecule.autoBond();
+
+    return molecule;
+  }
+
+  static fromSimpleStructuralFormula(
+    formula: string,
+    center: [number, number]
+  ) {
+    const atoms = Molecule.parseFormula(formula).map(
+      (symbol) => new Atom(symbol, [0, 0])
+    );
+
+    const molecule = new Molecule();
+    const deferedBonds: [Atom, Atom][] = [];
+    let lastAtom: Atom;
+    for (const atom of atoms) {
+      molecule.addAtom(atom);
+
+      if (lastAtom?.requiredBonds > atom?.requiredBonds) {
+        deferedBonds.push([lastAtom, atom]);
+        continue;
+      }
+
+      if (lastAtom) {
+        molecule.bond(lastAtom, atom);
+      }
+      lastAtom = atom;
+    }
+    for (const [a, b] of deferedBonds) {
+      molecule.bond(a, b);
+    }
+
+    molecule.center(center);
 
     return molecule;
   }
 
   private static parseFormula(formula: string) {
-    const atoms: [string, number][] = [];
-    for (let i = 0; i < formula.length;) {
+    const atoms: string[] = [];
+    for (let i = 0; i < formula.length; ) {
       let symbol = formula[i++];
-      let count = '';
+      let countStr = '';
       while (i < formula.length && isLower(formula[i])) {
         symbol += formula[i++];
       }
       while (i < formula.length && isNumeric(formula[i])) {
-        count += formula[i++];
+        countStr += formula[i++];
       }
 
-      atoms.push([symbol, +count || 1]);
+      const count = +countStr || 1;
+      for (let j = 0; j < count; j++) {
+        atoms.push(symbol);
+      }
     }
     return atoms;
   }
@@ -72,9 +108,7 @@ export class Molecule {
       return;
     }
 
-    if (dist(atom1.position, atom2.position) < minBondLength) {
-      atom2.position = this.getNextBondingPosition(atom1);
-    }
+    atom2.position = this.getNextBondingPosition(atom1);
 
     const bond = new Bond(atom1, atom2, count);
     this.bonds.push(bond);
@@ -158,6 +192,26 @@ export class Molecule {
     const bondList = this.bondMap.get(atom);
     const totalBonds = bondList.reduce((acc, bond) => acc + bond.count, 0);
     return totalBonds;
+  }
+
+  center(center?: [number, number]): [number, number] {
+    const cx =
+      this.atoms.reduce((acc, atom) => acc + atom.position[0], 0) /
+      this.atoms.length;
+    const cy =
+      this.atoms.reduce((acc, atom) => acc + atom.position[1], 0) /
+      this.atoms.length;
+    if (!center) {
+      return [cx, cy];
+    }
+
+    const dx = center[0] - cx;
+    const dy = center[1] - cy;
+    for (const atom of this.atoms) {
+      atom.position[0] += dx;
+      atom.position[1] += dy;
+    }
+    return center;
   }
 }
 
