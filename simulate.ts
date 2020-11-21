@@ -3,6 +3,10 @@ import { Molecule } from "./molecule";
 
 const bondRestingLength = 50;
 
+// These are calculated differently
+const repulsiveForce = 500;
+const bondLengthForce = 0.2;
+
 export function simulate(molecule: Molecule, dt: number) {
   for (const atom1 of molecule.atoms) {
     for (const atom2 of molecule.atoms) {
@@ -12,7 +16,7 @@ export function simulate(molecule: Molecule, dt: number) {
 
       const d = dist(atom1.position, atom2.position);
       const n = normV(subV(atom1.position, atom2.position));
-      const vel = scaleV(500 / (d * d), n);
+      const vel = scaleV(repulsiveForce / (d * d), n);
       atom1.position = addV(atom1.position, vel);
     }
   }
@@ -29,7 +33,7 @@ export function simulate(molecule: Molecule, dt: number) {
 
       const d = dist(atom1.position, atom2.position);
       const n = normV(subV(atom1.position, atom2.position));
-      const vel = scaleV(0.2 * (bondRestingLength - d), n);
+      const vel = scaleV(bondLengthForce * (bondRestingLength - d), n);
       atom1.position = addV(atom1.position, vel);
     }
   }
