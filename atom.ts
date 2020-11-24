@@ -12,6 +12,9 @@ export class Atom {
   get atomicNumber() {
     return atomicNumbers[this.symbol];
   }
+  get elementInfo() {
+    return elementInfo[this.symbol];
+  }
   get requiredBonds() {
     return elementInfo[this.symbol].requiredBonds;
   }
