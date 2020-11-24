@@ -4,18 +4,11 @@ import { simulate } from './simulate';
 
 const canvas = new Canvas('main-canvas');
 
-let molecule = Molecule.fromStructuralFormula(
-  'CH3C(CH2CH3)CHCHCOHO',
-  canvas.center
-);
-
-canvas.animate((dt) => {
-  simulate(molecule, dt);
-  molecule.center(canvas.center);
-  molecule.draw(canvas);
-});
-
+const twoDInput = document.getElementById('two-d') as HTMLInputElement;
+twoDInput.checked = true;
+const threeDInput = document.getElementById('three-d') as HTMLInputElement;
 const error = document.getElementById('error');
+
 for (const form of document.forms) {
   form.addEventListener('submit', (ev) => {
     ev.preventDefault();
@@ -39,3 +32,16 @@ for (const form of document.forms) {
     }
   });
 }
+
+let molecule = Molecule.fromStructuralFormula(
+  'CH3C(CH2CH3)CHCHCOHO',
+  canvas.center
+);
+
+canvas.animate((dt) => {
+  if (twoDInput.checked) {
+    simulate(molecule, dt);
+    molecule.center(canvas.center);
+    molecule.draw(canvas);
+  }
+});
