@@ -6,6 +6,7 @@ import { Atom } from './atom';
 
 const bondRestingLength = 50;
 const hydrogenBondRestingLength = 30;
+const initialDepth = 20;
 
 // These are calculated differently
 const repulsiveForce = 500;
@@ -129,7 +130,7 @@ export class SimulatedAtom extends THREE.Mesh {
     super(sphereGeometry, material);
     this.atom = atom;
     // Randomize the Z component so that it can leave the plane later
-    this.position.set(atom.position[0], -atom.position[1], Math.random());
+    this.position.set(atom.position[0], -atom.position[1], initialDepth * Math.random());
     this.scale.setScalar(atom.elementInfo.electronConfiguration.length + 1);
   }
 }
