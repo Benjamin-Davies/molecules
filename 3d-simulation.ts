@@ -5,6 +5,7 @@ import { AmbientLight, DirectionalLight, Vector3 } from 'three';
 import { Atom } from './atom';
 
 const bondRestingLength = 50;
+const hydrogenBondRestingLength = 30;
 
 // These are calculated differently
 const repulsiveForce = 500;
@@ -65,9 +66,13 @@ export class ThreeDSimulation {
           continue;
         }
 
+        const len =
+          atom1.atom.symbol === 'H' || atom2.atom.symbol === 'H'
+            ? hydrogenBondRestingLength
+            : bondRestingLength;
         const d = atom1.position.distanceTo(atom2.position);
         const n = atom1.position.clone().sub(atom2.position).normalize();
-        const vel = n.multiplyScalar(bondLengthForce * (bondRestingLength - d));
+        const vel = n.multiplyScalar(bondLengthForce * (len - d));
         atom1.position.add(vel);
       }
     }
