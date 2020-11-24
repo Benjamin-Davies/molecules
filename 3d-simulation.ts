@@ -18,6 +18,7 @@ export class ThreeDSimulation {
   camera: THREE.PerspectiveCamera;
   sphereGeometry: THREE.BufferGeometry;
   material: THREE.MeshPhongMaterial;
+  group: THREE.Group;
 
   atoms: SimulatedAtom[] = [];
 
@@ -32,13 +33,14 @@ export class ThreeDSimulation {
     const ambient = new AmbientLight(0xffffff, 0.8);
     const directional = new DirectionalLight(0xffffff, 1);
     directional.position.set(3, 7, 5);
-    this.scene.add(this.camera, ambient, directional);
+    this.group = new THREE.Group();
+    this.scene.add(this.camera, ambient, directional, this.group);
 
     molecule.center([0, 0]);
     for (const atom of molecule.atoms) {
       const sphere = new SimulatedAtom(atom);
       this.atoms.push(sphere);
-      this.scene.add(sphere);
+      this.group.add(sphere);
     }
   }
 
@@ -83,6 +85,8 @@ export class ThreeDSimulation {
     for (const atom of this.atoms) {
       atom.position.sub(center);
     }
+
+    this.group.rotation.y += 0.5 * dt;
   }
 
   draw(canvas: Canvas) {
