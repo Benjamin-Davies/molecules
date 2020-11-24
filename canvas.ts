@@ -74,4 +74,8 @@ export class Canvas {
       this.ctx.stroke();
     }
   }
+
+  drawImage(position: [number, number], image: HTMLImageElement | HTMLCanvasElement) {
+    this.ctx.drawImage(image, ...position);
+  }
 }

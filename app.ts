@@ -1,3 +1,4 @@
+import { ThreeDSimulation } from './3d-simulation';
 import { Canvas } from './canvas';
 import { Molecule } from './molecule';
 import { simulate } from './simulate';
@@ -5,7 +6,6 @@ import { simulate } from './simulate';
 const canvas = new Canvas('main-canvas');
 
 const twoDInput = document.getElementById('two-d') as HTMLInputElement;
-twoDInput.checked = true;
 const threeDInput = document.getElementById('three-d') as HTMLInputElement;
 const error = document.getElementById('error');
 
@@ -37,11 +37,19 @@ let molecule = Molecule.fromStructuralFormula(
   'CH3C(CH2CH3)CHCHCOHO',
   canvas.center
 );
+let threeDSimulation: ThreeDSimulation;
 
 canvas.animate((dt) => {
   if (twoDInput.checked) {
     simulate(molecule, dt);
     molecule.center(canvas.center);
     molecule.draw(canvas);
+  } else if (threeDInput.checked) {
+    if (threeDSimulation?.molecule !== molecule) {
+      threeDSimulation = new ThreeDSimulation(molecule);
+    }
+
+    threeDSimulation.simulate(dt);
+    threeDSimulation.draw(canvas);
   }
 });
