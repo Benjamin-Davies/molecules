@@ -6,11 +6,19 @@
   <title>Molecules</title>
   <style>
   </style>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.scss">
 </head>
 <body>
   <div class="canvas-container">
     <canvas id="main-canvas"></canvas>
+  </div>
+
+  <div class="tabs">
+    <input type="radio" name="view" id="two-d">
+    <label for="two-d">2D</label>
+    <input type="radio" name="view" id="three-d">
+    <label for="three-d">3D</label>
+    <div class="tab-slider"></div>
   </div>
 
   <div class="form-container">
