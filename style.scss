@@ -22,8 +22,13 @@ canvas {
 .form-container {
   box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.1);
   padding: 1rem;
-}
 
-.form-container#error {
-  color: red;
+  #error {
+    color: red;
+    font-weight: bold;
+  }
+
+  input, button {
+    font-size: 1em;
+  }
 }
