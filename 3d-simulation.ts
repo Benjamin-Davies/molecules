@@ -9,7 +9,8 @@ const hydrogenBondRestingLength = 30;
 const initialDepth = 20;
 
 // These are calculated differently
-const repulsiveForce = 500;
+const repulsiveForce = 200;
+const bondRepulsiveForce = 2000;
 const bondLengthForce = 0.2;
 
 export class ThreeDSimulation {
@@ -46,6 +47,7 @@ export class ThreeDSimulation {
   }
 
   simulate(dt: number) {
+    // atom-atom repulsion
     for (const atom1 of this.atoms) {
       for (const atom2 of this.atoms) {
         if (atom1 === atom2) {
@@ -59,6 +61,35 @@ export class ThreeDSimulation {
       }
     }
 
+    // bond repulsion
+    const bondedAtoms = [];
+    for (const centralAtom of this.atoms) {
+      bondedAtoms.length = 0;
+      for (const otherAtom of this.atoms) {
+        if (centralAtom === otherAtom) {
+          continue;
+        }
+        const bond = this.molecule.findBond(centralAtom.atom, otherAtom.atom);
+        if (bond) {
+          bondedAtoms.push(otherAtom);
+        }
+      }
+
+      for (const atom1 of bondedAtoms) {
+        for (const atom2 of bondedAtoms) {
+          if (atom1 === atom2) {
+            continue;
+          }
+
+          const d = atom1.position.distanceTo(atom2.position);
+          const n = atom1.position.clone().sub(atom2.position).normalize();
+          const vel = n.multiplyScalar(bondRepulsiveForce / (d * d));
+          atom1.position.add(vel);
+        }
+      }
+    }
+
+    // bonds as springs
     for (const atom1 of this.atoms) {
       for (const atom2 of this.atoms) {
         if (atom1 === atom2) {
