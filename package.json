@@ -5,6 +5,7 @@
   "main": "app.js",
   "dependencies": {
     "parcel": "*",
+    "parjs": "^0.12.7",
     "three": "^0.122.0"
   },
   "devDependencies": {

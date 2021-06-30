@@ -88,6 +88,10 @@ export class Molecule {
     }
   }
 
+  static fromIUPACFormula(formula: string, center: [number, number]) {
+    throw new Error('Not implemented');
+  }
+
   join(other: Molecule): Molecule {
     const atom1 = this.freeAtom;
     const atom2 = other.freeAtom;
